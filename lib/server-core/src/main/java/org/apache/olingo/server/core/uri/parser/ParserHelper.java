@@ -77,6 +77,7 @@ public class ParserHelper {
     temp.put(TokenKind.DecimalValue, EdmPrimitiveTypeKind.Decimal);
     temp.put(TokenKind.DoubleValue, EdmPrimitiveTypeKind.Double);
     temp.put(TokenKind.DurationValue, EdmPrimitiveTypeKind.Duration);
+    temp.put(TokenKind.TimespanValue, EdmPrimitiveTypeKind.Timespan);
     temp.put(TokenKind.BinaryValue, EdmPrimitiveTypeKind.Binary);
 
     temp.put(TokenKind.GeographyPoint, EdmPrimitiveTypeKind.GeographyPoint);
@@ -127,6 +128,8 @@ public class ParserHelper {
         TokenKind.BooleanValue,
         TokenKind.StringValue,
 
+        TokenKind.TimespanValue,
+        
         // The order of the next seven expressions is important in order to avoid
         // finding partly parsed tokens (counter-intuitive as it may be, even a GUID may start with digits ...).
         TokenKind.GuidValue,

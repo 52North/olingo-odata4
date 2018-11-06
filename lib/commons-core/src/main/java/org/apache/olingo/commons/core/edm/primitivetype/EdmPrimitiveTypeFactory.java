@@ -47,6 +47,8 @@ public final class EdmPrimitiveTypeFactory {
       return EdmTimeOfDay.getInstance();
     case Duration:
       return EdmDuration.getInstance();
+    case Timespan:
+        return EdmTimespan.getInstance();
     case Decimal:
       return EdmDecimal.getInstance();
     case Single:

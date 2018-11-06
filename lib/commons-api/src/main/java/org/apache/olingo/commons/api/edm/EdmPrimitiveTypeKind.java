@@ -31,6 +31,7 @@ public enum EdmPrimitiveTypeKind {
   DateTimeOffset,
   TimeOfDay,
   Duration,
+  Timespan,
   Decimal,
   Single,
   Double,

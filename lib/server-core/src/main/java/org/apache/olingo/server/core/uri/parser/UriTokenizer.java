@@ -90,6 +90,7 @@ public class UriTokenizer {
     DecimalValue,
     DoubleValue,
     DurationValue,
+    TimespanValue,
     BinaryValue,
     EnumValue,
 
@@ -403,6 +404,9 @@ public class UriTokenizer {
       break;
     case DurationValue:
       found = nextDurationValue();
+      break;
+    case TimespanValue:
+      found = nextTimespanValue();
       break;
     case BinaryValue:
       found = nextBinaryValue();
@@ -1096,6 +1100,12 @@ public class UriTokenizer {
     }
     return false;
   }
+  
+  private boolean nextTimespanValue() {
+      return nextDateTimeOffsetValue()
+             && nextCharacter('/')
+             && nextDateTimeOffsetValue();
+    }
 
   private boolean nextBinaryValue() {
     if (nextConstantIgnoreCase("binary") && nextCharacter('\'')) {
