@@ -215,6 +215,7 @@ public class UriValidator {
   private UriType getUriTypeForValue(final UriResource secondLastPathSegment) throws UriValidationException {
     UriType uriType;
     switch (secondLastPathSegment.getKind()) {
+    case complexProperty:
     case primitiveProperty:
       uriType = UriType.propertyPrimitiveValue;
       break;
