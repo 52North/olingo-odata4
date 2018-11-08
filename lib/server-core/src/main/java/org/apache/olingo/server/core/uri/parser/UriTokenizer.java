@@ -93,6 +93,7 @@ public class UriTokenizer {
     TimespanValue,
     BinaryValue,
     EnumValue,
+    AnyValue,
 
     GeographyPoint,
     GeometryPoint,
@@ -375,6 +376,9 @@ public class UriTokenizer {
       break;
 
     // Primitive Values
+    case AnyValue:
+        found = nextAnyValue();
+        break;
     case BooleanValue:
       found = nextBooleanValue();
       break;
@@ -900,7 +904,19 @@ public class UriTokenizer {
   private boolean nextParameterAliasName() {
     return nextCharacter('@') && nextODataIdentifier();
   }
-
+  
+  /**
+   * Breaks upon the first whitespace encountered.
+   */
+  private boolean nextAnyValue() {
+    int length = 0;
+    while (!nextWhitespace()) {
+      length++;
+    }
+    index+=length;
+    return length > 0;
+  }
+  
   private boolean nextBooleanValue() {
     return nextConstantIgnoreCase("true") || nextConstantIgnoreCase("false");
   }

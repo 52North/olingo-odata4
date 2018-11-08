@@ -31,6 +31,8 @@ public final class EdmPrimitiveTypeFactory {
    */
   public static EdmPrimitiveType getInstance(final EdmPrimitiveTypeKind kind) {
     switch (kind) {
+    case Any:
+        return EdmAny.getInstance();
     case Binary:
       return EdmBinary.getInstance();
     case Boolean:

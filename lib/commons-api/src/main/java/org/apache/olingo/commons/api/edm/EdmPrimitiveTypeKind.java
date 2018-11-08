@@ -23,6 +23,7 @@ package org.apache.olingo.commons.api.edm;
  */
 public enum EdmPrimitiveTypeKind {
 
+  Any,
   Binary,
   Boolean,
   Byte,

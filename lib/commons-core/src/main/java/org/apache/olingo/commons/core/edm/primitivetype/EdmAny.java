@@ -18,30 +18,28 @@
  */
 package org.apache.olingo.commons.core.edm.primitivetype;
 
-import java.sql.Timestamp;
-import java.util.regex.Pattern;
-
 import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeException;
 
-public class EdmTimespan extends SingletonPrimitiveType {
+public class EdmAny extends SingletonPrimitiveType {
 
-  private static final Pattern PATTERN_ASCII = Pattern.compile("\\p{ASCII}*");
+  private static final EdmAny INSTANCE = new EdmAny();
 
-  private static final EdmTimespan INSTANCE = new EdmTimespan();
-
-  public static EdmTimespan getInstance() {
+  public static EdmAny getInstance() {
     return INSTANCE;
   }
 
   @Override
   public Class<?> getDefaultType() {
-    return String.class;
+    return byte[].class;
   }
 
+  /**
+   * Note: The underlying application should ensure reasonable compatibility checks.
+   */
   @Override
   public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return primitiveType instanceof EdmDateTimeOffset;
+    return true;
   }
 
   @Override
@@ -49,20 +47,8 @@ public class EdmTimespan extends SingletonPrimitiveType {
       final Boolean isNullable, final Integer maxLength, final Integer precision,
       final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    String[] split = value.split("\\/");
-    EdmDateTimeOffset timeParser = EdmDateTimeOffset.getInstance();
-
-    // Validate individual Timestamps
-    timeParser.internalValueOfString(split[0], isNullable, maxLength, precision, scale, isUnicode, Timestamp.class);
-    timeParser.internalValueOfString(split[1], isNullable, maxLength, precision, scale, isUnicode, Timestamp.class);
-
-    if (isUnicode != null && !isUnicode && !PATTERN_ASCII.matcher(value).matches()
-        || maxLength != null && maxLength < value.length()) {
-      throw new EdmPrimitiveTypeException("The literal '" + value + "' does not match the facets' constraints.");
-    }
-
-    if (returnType.isAssignableFrom(String.class)) {
-      return returnType.cast(value);
+    if (returnType.isAssignableFrom(byte[].class)) {
+      return returnType.cast(value.getBytes());
     } else {
       throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.");
     }
@@ -72,14 +58,11 @@ public class EdmTimespan extends SingletonPrimitiveType {
   protected <T> String internalValueToString(final T value,
       final Boolean isNullable, final Integer maxLength, final Integer precision,
       final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
-
-    final String result = value instanceof String ? (String) value : String.valueOf(value);
-
-    if (isUnicode != null && !isUnicode && !PATTERN_ASCII.matcher(result).matches()
-        || maxLength != null && maxLength < result.length()) {
-      throw new EdmPrimitiveTypeException("The value '" + value + "' does not match the facets' constraints.");
+    
+    if (value instanceof byte[]) {
+      return new String((byte[])value);
+    } else {
+      throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
     }
-
-    return result;
   }
 }

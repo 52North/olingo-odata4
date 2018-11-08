@@ -66,6 +66,7 @@ public class ParserHelper {
   static {
     /* Enum and null are not present in the map. These have to be handled differently. */
     Map<TokenKind, EdmPrimitiveTypeKind> temp = new EnumMap<TokenKind, EdmPrimitiveTypeKind>(TokenKind.class);
+    temp.put(TokenKind.AnyValue, EdmPrimitiveTypeKind.Any);
     temp.put(TokenKind.BooleanValue, EdmPrimitiveTypeKind.Boolean);
     temp.put(TokenKind.StringValue, EdmPrimitiveTypeKind.String);
     // Very large integer values are of type Edm.Decimal but this is handled elsewhere.
