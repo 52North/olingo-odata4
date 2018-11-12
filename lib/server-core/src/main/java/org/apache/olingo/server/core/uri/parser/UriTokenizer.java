@@ -1212,7 +1212,9 @@ public class UriTokenizer {
    */
   private boolean nextPointData() {
     final int lastGoodIndex = index;
+    nextWhitespace();
     if (nextCharacter('(') && nextPosition() && nextCharacter(')')) {
+      nextWhitespace();
       return true;
     } else {
       index = lastGoodIndex;
@@ -1226,7 +1228,7 @@ public class UriTokenizer {
 
   private boolean nextGeoPoint(final boolean isGeography) {
     return nextGeoPrefix(isGeography) && nextCharacter('\'')
-        && nextSrid() && nextCharacter(';') && nextPoint()
+        && (!nextSrid() || nextCharacter(';')) && nextPoint()
         && nextCharacter('\'');
   }
 

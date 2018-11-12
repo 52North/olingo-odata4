@@ -268,6 +268,16 @@ public class ExpressionJsonVisitor implements ExpressionVisitor<JsonNode> {
     case ENDSWITH:
     case ISOF:
     case GEOINTERSECTS:
+    case ST_CONTAINS:
+    case ST_CROSSES:
+    case ST_DISJOINT:
+    case ST_EQUALS:
+    case ST_INTERSECTS:
+    case ST_OVERLAPS:
+    case ST_RELATE:
+    case ST_TOUCHES:
+    case ST_WITHIN:
+    case SUBSTRINGOF:
       return BOOLEAN_NAME;
 
     case INDEXOF:
@@ -309,6 +319,8 @@ public class ExpressionJsonVisitor implements ExpressionVisitor<JsonNode> {
     case CAST:
       return UNKNOWN_NAME;
     }
+    
+    
     return UNKNOWN_NAME;
   }
 

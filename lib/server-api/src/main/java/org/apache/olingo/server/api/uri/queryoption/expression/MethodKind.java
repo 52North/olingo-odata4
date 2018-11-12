@@ -52,7 +52,20 @@ public enum MethodKind {
   GEOLENGTH("geo.length"),
   GEOINTERSECTS("geo.intersects"),
   CAST("cast"),
-  ISOF("isof");
+  ISOF("isof"),
+  
+  // STA Expansion
+  SUBSTRINGOF("substringof"),
+  
+  ST_EQUALS("st_equals"),
+  ST_DISJOINT("st_disjoint"),
+  ST_TOUCHES("st_touches"),
+  ST_WITHIN("st_within"),
+  ST_OVERLAPS("st_overlaps"),
+  ST_CROSSES("st_crosses"),
+  ST_INTERSECTS("st_intersects"),
+  ST_CONTAINS("st_contains"),
+  ST_RELATE("st_relate");
 
   private String syntax;
 
