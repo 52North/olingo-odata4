@@ -52,6 +52,7 @@ public class MethodImpl implements Method {
     EdmPrimitiveTypeKind kind = null;
     switch (method) {
     case CONTAINS:
+    case SUBSTRINGOF:
     case STARTSWITH:
     case ENDSWITH:
       kind = EdmPrimitiveTypeKind.Boolean;
@@ -111,6 +112,19 @@ public class MethodImpl implements Method {
     case ISOF:
       kind = EdmPrimitiveTypeKind.Boolean;
       break;
+    case ST_CONTAINS:
+    case ST_CROSSES:
+    case ST_DISJOINT:
+    case ST_EQUALS:
+    case ST_INTERSECTS:
+    case ST_OVERLAPS:
+    case ST_RELATE:
+    case ST_TOUCHES:
+    case ST_WITHIN:
+      kind = EdmPrimitiveTypeKind.Boolean;
+      break;
+    default:
+        break;
     }
     return new ODataImpl().createPrimitiveTypeInstance(kind);
   }

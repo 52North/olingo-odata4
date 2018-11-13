@@ -153,6 +153,18 @@ public class ExpressionParser {
     temp.put(TokenKind.ToupperMethod, MethodKind.TOUPPER);
     temp.put(TokenKind.TrimMethod, MethodKind.TRIM);
     temp.put(TokenKind.YearMethod, MethodKind.YEAR);
+    
+    //STA-specific Methods
+    temp.put(TokenKind.SubstringOfMethod, MethodKind.SUBSTRINGOF);
+    temp.put(TokenKind.ST_EqualsMethod, MethodKind.ST_EQUALS);
+    temp.put(TokenKind.ST_DisjointMethod, MethodKind.ST_DISJOINT);
+    temp.put(TokenKind.ST_TouchesMethod, MethodKind.ST_TOUCHES);
+    temp.put(TokenKind.ST_WithinMethod, MethodKind.ST_WITHIN);
+    temp.put(TokenKind.ST_OverlapsMethod, MethodKind.ST_OVERLAPS);
+    temp.put(TokenKind.ST_CrossesMethod, MethodKind.ST_CROSSES);
+    temp.put(TokenKind.ST_IntersectsMethod, MethodKind.ST_INTERSECTS);
+    temp.put(TokenKind.ST_ContainsMethod, MethodKind.ST_CONTAINS);
+    temp.put(TokenKind.ST_RelateMethod, MethodKind.ST_RELATE);
 
     tokenToMethod = Collections.unmodifiableMap(temp);
   }
@@ -523,6 +535,7 @@ public class ExpressionParser {
 
     // Must have two parameters.
     case CONTAINS:
+    case SUBSTRINGOF:
     case ENDSWITH:
     case STARTSWITH:
     case INDEXOF:
@@ -573,7 +586,81 @@ public class ExpressionParser {
       checkNoCollection(geoPolygonParameter);
       parameters.add(geoPolygonParameter);
       break;
+    case ST_DISJOINT:
+    case ST_EQUALS:
+    case ST_CROSSES:
+    case ST_TOUCHES:
+    case ST_WITHIN:
+    case ST_OVERLAPS:
+    case ST_CONTAINS:
+    case ST_INTERSECTS:
+        ParserHelper.bws(tokenizer);
+        final Expression firstExpr = parseExpression();
+        checkType(firstExpr,
+            EdmPrimitiveTypeKind.Geography, EdmPrimitiveTypeKind.Geometry,
+            EdmPrimitiveTypeKind.GeographyPoint, EdmPrimitiveTypeKind.GeometryPoint,
+            EdmPrimitiveTypeKind.GeographyMultiPoint, EdmPrimitiveTypeKind.GeometryMultiPoint,
+            EdmPrimitiveTypeKind.GeographyLineString, EdmPrimitiveTypeKind.GeometryLineString,
+            EdmPrimitiveTypeKind.GeographyMultiLineString, EdmPrimitiveTypeKind.GeometryMultiLineString,
+            EdmPrimitiveTypeKind.GeographyPolygon, EdmPrimitiveTypeKind.GeographyPolygon,
+            EdmPrimitiveTypeKind.GeographyMultiPolygon, EdmPrimitiveTypeKind.GeometryMultiPolygon);
+        checkNoCollection(firstExpr);
+        parameters.add(firstExpr);
+        ParserHelper.bws(tokenizer);
+        ParserHelper.requireNext(tokenizer, TokenKind.COMMA);
+        ParserHelper.bws(tokenizer);
+        final Expression secondExpr = parseExpression();
+        ParserHelper.bws(tokenizer);
+        checkType(secondExpr,
+                  EdmPrimitiveTypeKind.Geography, EdmPrimitiveTypeKind.Geometry,
+                  EdmPrimitiveTypeKind.GeographyPoint, EdmPrimitiveTypeKind.GeometryPoint,
+                  EdmPrimitiveTypeKind.GeographyMultiPoint, EdmPrimitiveTypeKind.GeometryMultiPoint,
+                  EdmPrimitiveTypeKind.GeographyLineString, EdmPrimitiveTypeKind.GeometryLineString,
+                  EdmPrimitiveTypeKind.GeographyMultiLineString, EdmPrimitiveTypeKind.GeometryMultiLineString,
+                  EdmPrimitiveTypeKind.GeographyPolygon, EdmPrimitiveTypeKind.GeographyPolygon,
+                  EdmPrimitiveTypeKind.GeographyMultiPolygon, EdmPrimitiveTypeKind.GeometryMultiPolygon);
+        checkNoCollection(secondExpr);
+        parameters.add(secondExpr);
+        break;
 
+    // Must have three parameters
+    case ST_RELATE:
+        ParserHelper.bws(tokenizer);
+        final Expression param1 = parseExpression();
+        checkType(param1,
+            EdmPrimitiveTypeKind.Geography, EdmPrimitiveTypeKind.Geometry,
+            EdmPrimitiveTypeKind.GeographyPoint, EdmPrimitiveTypeKind.GeometryPoint,
+            EdmPrimitiveTypeKind.GeographyMultiPoint, EdmPrimitiveTypeKind.GeometryMultiPoint,
+            EdmPrimitiveTypeKind.GeographyLineString, EdmPrimitiveTypeKind.GeometryLineString,
+            EdmPrimitiveTypeKind.GeographyMultiLineString, EdmPrimitiveTypeKind.GeometryMultiLineString,
+            EdmPrimitiveTypeKind.GeographyPolygon, EdmPrimitiveTypeKind.GeographyPolygon,
+            EdmPrimitiveTypeKind.GeographyMultiPolygon, EdmPrimitiveTypeKind.GeometryMultiPolygon);
+        checkNoCollection(param1);
+        parameters.add(param1);
+        ParserHelper.bws(tokenizer);
+        ParserHelper.requireNext(tokenizer, TokenKind.COMMA);
+        ParserHelper.bws(tokenizer);
+        final Expression param2 = parseExpression();
+        ParserHelper.bws(tokenizer);
+        checkType(param2,
+                  EdmPrimitiveTypeKind.Geography, EdmPrimitiveTypeKind.Geometry,
+                  EdmPrimitiveTypeKind.GeographyPoint, EdmPrimitiveTypeKind.GeometryPoint,
+                  EdmPrimitiveTypeKind.GeographyMultiPoint, EdmPrimitiveTypeKind.GeometryMultiPoint,
+                  EdmPrimitiveTypeKind.GeographyLineString, EdmPrimitiveTypeKind.GeometryLineString,
+                  EdmPrimitiveTypeKind.GeographyMultiLineString, EdmPrimitiveTypeKind.GeometryMultiLineString,
+                  EdmPrimitiveTypeKind.GeographyPolygon, EdmPrimitiveTypeKind.GeographyPolygon,
+                  EdmPrimitiveTypeKind.GeographyMultiPolygon, EdmPrimitiveTypeKind.GeometryMultiPolygon);
+        checkNoCollection(param2);
+        parameters.add(param2);
+        ParserHelper.bws(tokenizer);
+        ParserHelper.requireNext(tokenizer, TokenKind.COMMA);
+        ParserHelper.bws(tokenizer);
+        final Expression param3 = parseExpression();
+        checkType(param3, EdmPrimitiveTypeKind.String);
+        checkNoCollection(param3);
+        parameters.add(param3);
+        break;
+        
     // Can have two or three parameters.
     case SUBSTRING:
       ParserHelper.bws(tokenizer);

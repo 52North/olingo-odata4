@@ -90,10 +90,8 @@ public class UriTokenizer {
     DecimalValue,
     DoubleValue,
     DurationValue,
-    TimespanValue,
     BinaryValue,
     EnumValue,
-    AnyValue,
 
     GeographyPoint,
     GeometryPoint,
@@ -191,7 +189,21 @@ public class UriTokenizer {
     RollUpSpec, // for the aggregation extension
 
     AscSuffix,
-    DescSuffix
+    DescSuffix,
+    
+    // STA-specific Tokens
+    TimespanValue,
+    AnyValue,
+    SubstringOfMethod,
+    ST_EqualsMethod,
+    ST_DisjointMethod,
+    ST_TouchesMethod,
+    ST_WithinMethod,
+    ST_OverlapsMethod,
+    ST_CrossesMethod,
+    ST_IntersectsMethod,
+    ST_ContainsMethod,
+    ST_RelateMethod,
   }
 
   private final String parseString;
@@ -377,8 +389,8 @@ public class UriTokenizer {
 
     // Primitive Values
     case AnyValue:
-        found = nextAnyValue();
-        break;
+      found = nextAnyValue();
+      break;
     case BooleanValue:
       found = nextBooleanValue();
       break;
@@ -702,6 +714,41 @@ public class UriTokenizer {
     case DescSuffix:
       found = nextSuffix("desc");
       break;
+    
+    // STA-specific Spatial Operations
+    case ST_ContainsMethod:
+      found = nextMethod("st_contains");
+      break;
+    case ST_CrossesMethod:
+        found = nextMethod("st_crosses");
+      break;
+    case ST_DisjointMethod:
+        found = nextMethod("st_disjoint");
+      break;
+    case ST_EqualsMethod:
+        found = nextMethod("st_equals");
+      break;
+    case ST_IntersectsMethod:
+        found = nextMethod("st_intersects");
+        break;
+    case ST_OverlapsMethod:
+        found = nextMethod("st_overlaps");
+        break;
+    case ST_RelateMethod:
+        found = nextMethod("st_relate");
+        break;
+    case ST_TouchesMethod:
+        found = nextMethod("st_touches");
+        break;
+    case ST_WithinMethod:
+        found = nextMethod("st_within");
+        break;
+    case SubstringOfMethod:
+        found = nextMethod("substringof");
+        break;
+        
+    default:
+        break;
     }
 
     if (found) {
@@ -1244,7 +1291,9 @@ public class UriTokenizer {
       int count = 1;
       final String firstPosition = isRing ? parseString.substring(lastGoodIndex + 1, index) : null;
       int positionStart = -1;
+      nextWhitespace();
       while (nextCharacter(',')) {
+        nextWhitespace();
         positionStart = index;
         if (nextPosition()) {
           count++;
@@ -1264,6 +1313,7 @@ public class UriTokenizer {
           return false;
         }
       }
+      nextWhitespace();
       if (!nextCharacter(')')) {
         index = lastGoodIndex;
         return false;
@@ -1316,7 +1366,7 @@ public class UriTokenizer {
 
   private boolean nextGeoPolygon(final boolean isGeography) {
     return nextGeoPrefix(isGeography) && nextCharacter('\'')
-        && nextSrid() && nextCharacter(';') && nextPolygon() 
+        && (!nextSrid() || nextCharacter(';')) && nextPolygon() 
         && nextCharacter('\'');
   }
 
@@ -1333,7 +1383,7 @@ public class UriTokenizer {
 
   private boolean nextGeoMultiPoint(final boolean isGeography) {
     return nextGeoPrefix(isGeography) && nextCharacter('\'')
-        && nextSrid() && nextCharacter(';') && nextMultiPoint()
+        && (!nextSrid() || nextCharacter(';')) && nextMultiPoint()
         && nextCharacter('\'');
   }
 
@@ -1350,7 +1400,7 @@ public class UriTokenizer {
 
   private boolean nextGeoMultiLineString(final boolean isGeography) {
     return nextGeoPrefix(isGeography) && nextCharacter('\'')
-        && nextSrid() && nextCharacter(';') && nextMultiLineString()
+        && (!nextSrid() || nextCharacter(';')) && nextMultiLineString()
         && nextCharacter('\'');
   }
 
@@ -1367,7 +1417,7 @@ public class UriTokenizer {
 
   private boolean nextGeoMultiPolygon(final boolean isGeography) {
     return nextGeoPrefix(isGeography) && nextCharacter('\'')
-        && nextSrid() && nextCharacter(';') && nextMultiPolygon()
+        && (!nextSrid() || nextCharacter(';')) && nextMultiPolygon()
         && nextCharacter('\'');
   }
 
