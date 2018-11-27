@@ -1325,20 +1325,24 @@ public class ExpressionParser {
     checkNoCollection(right);
     final EdmType leftType = getType(left);
     final EdmType rightType = getType(right);
+    if (leftType.equals(odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Any))
+        || rightType.equals(odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Any))) {
+      return;
+    }
     checkType(left,
         EdmPrimitiveTypeKind.Int16, EdmPrimitiveTypeKind.Int32, EdmPrimitiveTypeKind.Int64,
         EdmPrimitiveTypeKind.Byte, EdmPrimitiveTypeKind.SByte,
         EdmPrimitiveTypeKind.Decimal, EdmPrimitiveTypeKind.Single, EdmPrimitiveTypeKind.Double,
         EdmPrimitiveTypeKind.Boolean, EdmPrimitiveTypeKind.Guid, EdmPrimitiveTypeKind.String,
         EdmPrimitiveTypeKind.Date, EdmPrimitiveTypeKind.TimeOfDay,
-        EdmPrimitiveTypeKind.DateTimeOffset, EdmPrimitiveTypeKind.Duration);
+        EdmPrimitiveTypeKind.DateTimeOffset, EdmPrimitiveTypeKind.Duration, EdmPrimitiveTypeKind.Timespan);
     checkType(right,
         EdmPrimitiveTypeKind.Int16, EdmPrimitiveTypeKind.Int32, EdmPrimitiveTypeKind.Int64,
         EdmPrimitiveTypeKind.Byte, EdmPrimitiveTypeKind.SByte,
         EdmPrimitiveTypeKind.Decimal, EdmPrimitiveTypeKind.Single, EdmPrimitiveTypeKind.Double,
         EdmPrimitiveTypeKind.Boolean, EdmPrimitiveTypeKind.Guid, EdmPrimitiveTypeKind.String,
         EdmPrimitiveTypeKind.Date, EdmPrimitiveTypeKind.TimeOfDay,
-        EdmPrimitiveTypeKind.DateTimeOffset, EdmPrimitiveTypeKind.Duration);
+        EdmPrimitiveTypeKind.DateTimeOffset, EdmPrimitiveTypeKind.Duration, EdmPrimitiveTypeKind.Timespan);
     if (leftType == null || rightType == null) {
       return;
     }

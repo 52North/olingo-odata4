@@ -41,7 +41,7 @@ public class EdmTimespan extends SingletonPrimitiveType {
 
   @Override
   public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return primitiveType instanceof EdmDateTimeOffset;
+    return primitiveType instanceof EdmDateTimeOffset || primitiveType instanceof EdmTimespan;
   }
 
   @Override
@@ -52,10 +52,13 @@ public class EdmTimespan extends SingletonPrimitiveType {
     String[] split = value.split("\\/");
     EdmDateTimeOffset timeParser = EdmDateTimeOffset.getInstance();
 
-    // Validate individual Timestamps
     timeParser.internalValueOfString(split[0], isNullable, maxLength, precision, scale, isUnicode, Timestamp.class);
-    timeParser.internalValueOfString(split[1], isNullable, maxLength, precision, scale, isUnicode, Timestamp.class);
-
+    
+    // Validate endTime if given
+    if (split.length != 1) {
+      timeParser.internalValueOfString(split[1], isNullable, maxLength, precision, scale, isUnicode, Timestamp.class);
+    }
+    
     if (isUnicode != null && !isUnicode && !PATTERN_ASCII.matcher(value).matches()
         || maxLength != null && maxLength < value.length()) {
       throw new EdmPrimitiveTypeException("The literal '" + value + "' does not match the facets' constraints.");
