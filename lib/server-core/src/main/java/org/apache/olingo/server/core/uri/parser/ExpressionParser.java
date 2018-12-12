@@ -989,6 +989,9 @@ public class ExpressionParser {
           setTypeFilter(lastResource, edmEntityType);
         }
         hasSlash = false;
+      } else if (tokenizer.next(TokenKind.ODataIdentifier)) {
+        parseMemberExpression(TokenKind.ODataIdentifier, uriInfo, lastResource, true);
+        hasSlash = false;
       }
     }
 
@@ -1072,6 +1075,8 @@ public class ExpressionParser {
     } else if (tokenizer.next(TokenKind.ALL)) {
       uriInfo.addResourcePart(parseLambdaRest(TokenKind.ALL, lastResource));
     } else if (tokenizer.next(TokenKind.QualifiedName)) {
+      parseBoundFunction(new FullQualifiedName(tokenizer.getText()), uriInfo, lastResource);
+    } else if (tokenizer.next(TokenKind.ODataIdentifier)) {
       parseBoundFunction(new FullQualifiedName(tokenizer.getText()), uriInfo, lastResource);
     } else {
       throw new UriParserSyntaxException("Unexpected token.", UriParserSyntaxException.MessageKeys.SYNTAX);

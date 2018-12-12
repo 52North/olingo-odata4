@@ -87,6 +87,13 @@ public class ExpandParser {
 
     return expandOption;
   }
+  
+  private ExpandOption parseSubExpansion(UriTokenizer tokenizer, final EdmStructuredType referencedType)
+      throws UriParserException, UriValidationException {
+    ExpandOptionImpl expandOption = new ExpandOptionImpl();
+    final ExpandItem item = parseItem(tokenizer, referencedType);
+    return expandOption.addExpandItem(item);
+  }
 
   private ExpandItem parseCrossJoinItem(UriTokenizer tokenizer) throws UriParserSemanticException {
     ExpandItemImpl item = new ExpandItemImpl();
@@ -169,16 +176,17 @@ public class ExpandParser {
             resource.addResourcePart(new UriResourceRefImpl());
             item.setIsRef(true);
             parseOptions(tokenizer, newReferencedType, newReferencedIsCollection, item, true, false);
-          } else {
-            ParserHelper.requireNext(tokenizer, TokenKind.COUNT);
+          } else if (tokenizer.next(TokenKind.COUNT)) {
             resource.addResourcePart(new UriResourceCountImpl());
             item.setCountPath(true);
             parseOptions(tokenizer, newReferencedType, newReferencedIsCollection, item, false, true);
+          } else {
+            // Expansion via Slash Operator
+            item.setSystemQueryOption(this.parseSubExpansion(tokenizer, newReferencedType));
           }
         } else {
           parseOptions(tokenizer, newReferencedType, newReferencedIsCollection, item, false, false);
         }
-  
         item.setResourcePath(resource);
       }
      }
