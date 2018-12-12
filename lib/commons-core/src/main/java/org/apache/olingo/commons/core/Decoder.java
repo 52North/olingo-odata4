@@ -29,7 +29,7 @@ public class Decoder {
 
   /**
    * Decodes a percent-encoded UTF-8 String value into a Java String
-   * (in its internal UTF-16 encoding).
+   * (in its internal UTF-16 encoding). The '+' character is encoded to a single whitespace. 
    * @param value the encoded String
    * @return the Java String
    * @throws IllegalArgumentException if value contains characters not representing UTF-8 bytes
@@ -69,6 +69,8 @@ public class Decoder {
             throw new NumberFormatException();
           }
           encodedPart = -2;
+        } else if (c == '+') {
+          result[position++] = (byte) ' ';
         } else {
           result[position++] = (byte) c;
         }
