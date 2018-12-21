@@ -19,7 +19,10 @@
 package org.apache.olingo.server.core.uri.parser;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
@@ -74,28 +77,52 @@ public class ExpandParser {
   public ExpandOption parse(UriTokenizer tokenizer, final EdmStructuredType referencedType)
       throws UriParserException, UriValidationException {
     ExpandOptionImpl expandOption = new ExpandOptionImpl();
+    Set<ExpandItemImpl> expandItems = new HashSet<ExpandItemImpl>();
     do {
       // In the crossjoin case the start has to be an EntitySet name which will dictate the reference type
       if (crossjoinEntitySetNames != null && !crossjoinEntitySetNames.isEmpty()) {
-        final ExpandItem item = parseCrossJoinItem(tokenizer);
-        expandOption.addExpandItem(item);
+        final ExpandItemImpl item = parseCrossJoinItem(tokenizer);
+        mergeAndStoreExpandItems(item, expandItems);
       } else {
-        final ExpandItem item = parseItem(tokenizer, referencedType);
-        expandOption.addExpandItem(item);
+        final ExpandItemImpl item = parseItem(tokenizer, referencedType);
+        mergeAndStoreExpandItems(item, expandItems);
       }
     } while (tokenizer.next(TokenKind.COMMA));
+    
+    Iterator<ExpandItemImpl> iter = expandItems.iterator();
+    while (iter.hasNext()) {
+      expandOption.addExpandItem(iter.next());
+    }
 
     return expandOption;
+  }
+  
+  private ExpandItem mergeAndStoreExpandItems(ExpandItemImpl o, Set<ExpandItemImpl> expandItems) {
+    if (expandItems.contains(o)) {
+      Iterator<ExpandItemImpl> iter = expandItems.iterator();
+      while (iter.hasNext()) {
+        ExpandItemImpl item = iter.next();
+        if (item.equals(o)) {
+          // Join ExpandItemImpl
+          item.setSystemQueryOption(o.getExpandOption());
+          return item;
+        }
+      }
+    } else {
+      expandItems.add(o);
+      return o;
+    }
+    return null;
   }
   
   private ExpandOption parseSubExpansion(UriTokenizer tokenizer, final EdmStructuredType referencedType)
       throws UriParserException, UriValidationException {
     ExpandOptionImpl expandOption = new ExpandOptionImpl();
-    final ExpandItem item = parseItem(tokenizer, referencedType);
+    final ExpandItemImpl item = parseItem(tokenizer, referencedType);
     return expandOption.addExpandItem(item);
   }
 
-  private ExpandItem parseCrossJoinItem(UriTokenizer tokenizer) throws UriParserSemanticException {
+  private ExpandItemImpl parseCrossJoinItem(UriTokenizer tokenizer) throws UriParserSemanticException {
     ExpandItemImpl item = new ExpandItemImpl();
     if (tokenizer.next(TokenKind.STAR)) {
       item.setIsStar(true);
@@ -120,7 +147,7 @@ public class ExpandParser {
     return item;
   }
 
-  private ExpandItem parseItem(UriTokenizer tokenizer, final EdmStructuredType referencedType)
+  private ExpandItemImpl parseItem(UriTokenizer tokenizer, final EdmStructuredType referencedType)
       throws UriParserException, UriValidationException {
     ExpandItemImpl item = new ExpandItemImpl();
     if (tokenizer.next(TokenKind.STAR)) {

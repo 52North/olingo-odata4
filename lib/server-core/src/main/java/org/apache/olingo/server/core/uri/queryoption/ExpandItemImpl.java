@@ -18,7 +18,9 @@
  */
 package org.apache.olingo.server.core.uri.queryoption;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
@@ -62,8 +64,11 @@ public class ExpandItemImpl implements ExpandItem {
       validateDoubleSystemQueryOption(applyOption, sysItem);
       applyOption = (ApplyOption) sysItem;
     } else if (sysItem instanceof ExpandOption) {
-      validateDoubleSystemQueryOption(expandOption, sysItem);
-      expandOption = (ExpandOption) sysItem;
+      if (expandOption != null) {
+        mergeExpandItems((ExpandOption) sysItem);
+      } else {
+        expandOption = (ExpandOption) sysItem;
+      }
     } else if (sysItem instanceof FilterOption) {
       validateDoubleSystemQueryOption(filterOption, sysItem);
       filterOption = (FilterOption) sysItem;
@@ -92,6 +97,26 @@ public class ExpandItemImpl implements ExpandItem {
       levelsExpandOption = (LevelsExpandOption) sysItem;
     }
     return this;
+  }
+  
+  protected void mergeExpandItems(ExpandOption newOption) {
+    ExpandOptionImpl finalExpandImpl = (ExpandOptionImpl) expandOption;
+    List<ExpandItem> oldExpandItems = finalExpandImpl.getExpandItems();
+    List<ExpandItem> newExpandItems = newOption.getExpandItems();
+    
+    Iterator<ExpandItem> iter = newExpandItems.iterator();
+    while (iter.hasNext()) {
+      ExpandItem element = iter.next();
+      // Recursively join
+      int index = oldExpandItems.indexOf(element);
+      // Modify existing Item if present, else add new one
+      if (index != -1) {
+        ((ExpandItemImpl)oldExpandItems.get(index)).mergeExpandItems(element.getExpandOption());
+      } else {
+        finalExpandImpl.addExpandItem(element);
+      }
+    }
+    expandOption = finalExpandImpl;
   }
 
   private void validateDoubleSystemQueryOption(final SystemQueryOption oldOption, final SystemQueryOption newOption) {
@@ -206,5 +231,46 @@ public class ExpandItemImpl implements ExpandItem {
   
   public void setCountPath(boolean value) {
     this.hasCountPath = value;
+  }
+  
+  
+  @Override
+  public boolean equals(Object o) {
+      if (!(o instanceof ExpandItem)) {
+          return false;
+      }
+      ExpandItem item = (ExpandItem) o;
+      return equalsWithNull(item.getResourcePath().getUriResourceParts(), this.getResourcePath().getUriResourceParts())
+          && equalsWithNull(item.getApplyOption(), this.getApplyOption())
+          && equalsWithNull(item.getCountOption(), this.getCountOption())
+          && equalsWithNull(item.getFilterOption(), this.getFilterOption())
+          && equalsWithNull(item.getLevelsOption(), this.getLevelsOption())
+          && equalsWithNull(item.getOrderByOption(), this.getOrderByOption())
+          && equalsWithNull(item.getSelectOption(), this.getSelectOption())
+          && equalsWithNull(item.getSkipOption(), this.getSkipOption())
+          && equalsWithNull(item.getTopOption(), this.getTopOption());
+  }
+  
+  private boolean equalsWithNull(Object o1, Object o2) {
+    if (o1 == null && o2 == null) {
+      return true;
+    } else if (o1 == null || o2 == null) {
+      return false;
+    } else {
+      return o1.equals(o2);
+    }
+  }
+
+  @Override
+  public int hashCode() {
+      return Objects.hash(levelsExpandOption,
+                          filterOption,
+                          searchOption,
+                          orderByOption,
+                          skipOption,
+                          topOption,
+                          inlineCountOption,
+                          selectOption,
+                          applyOption);
   }
 }
