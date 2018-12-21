@@ -257,7 +257,7 @@ public class ExpandItemImpl implements ExpandItem {
     } else if (o1 == null || o2 == null) {
       return false;
     } else {
-      return o1.equals(o2);
+      return o1.toString().equals(o2.toString());
     }
   }
 
