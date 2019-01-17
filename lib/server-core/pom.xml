@@ -105,7 +105,7 @@
             <Implementation-Version>${project.version}</Implementation-Version>
             <Implementation-Title>${project.name}</Implementation-Title>
             <Export-Package>
-              org.apache.olingo.server.core
+              org.apache.olingo.server.core;org.apache.olingo.server.core.parser
             </Export-Package>
             <Import-Package>
               *
