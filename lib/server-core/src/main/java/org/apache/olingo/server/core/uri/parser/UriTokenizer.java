@@ -971,20 +971,7 @@ public class UriTokenizer {
    * Breaks upon the first round closing bracket.
    */
   private boolean nextIdentifierValue() {
-    int original = index;
-    while (!nextCharacter(')') && index < parseString.length()) {
-      index++;
-    }
-    
-    if (index == original+1) {
-      // reset index if we have empty identifier
-      index = original;
-      return false;
-    } else {
-      // correct index as we run 1 too far
-      index--;
-      return true;
-    }
+    return nextStringValue() || nextIntegerValue(false);
   }
   
   private boolean nextBooleanValue() {
