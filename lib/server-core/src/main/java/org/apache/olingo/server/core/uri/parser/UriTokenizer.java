@@ -960,11 +960,20 @@ public class UriTokenizer {
    * Breaks upon the first whitespace
    */
   private boolean nextAnyValue() {
-    int original = index;
-    while (!nextWhitespace() && index < parseString.length()) {
-      index++;
+    if (!nextQualifiedName() && !nextODataIdentifier()) {
+      int original = index;
+      while (!nextWhitespace() && index < parseString.length()) {
+        index++;
+      }
+      if (index > original) {
+        index--;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
-    return index > original;
   }
   
   /**
