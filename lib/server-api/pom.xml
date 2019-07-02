@@ -46,14 +46,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-	  <groupId>io.netty</groupId>
-	  <artifactId>netty-all</artifactId>
-	  <version>4.1.16.Final</version>
-	</dependency>
   </dependencies>
 
   <build>
@@ -73,13 +74,15 @@
         <configuration>
           <instructions>
             <Export-Package>
-              org.apache.olingo.server.api*
+              org.apache.olingo.server.api*,
+              org.apache.olingo.netty.server.api*
             </Export-Package>
             <Import-Package>
               *
             </Import-Package>
             <!-- workaround due to the current server-api server-core interdependency -->
             <DynamicImport-Package>
+              org.apache.olingo.netty.server.core,
               org.apache.olingo.server.core
             </DynamicImport-Package>
           </instructions>

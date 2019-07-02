@@ -168,6 +168,14 @@ public class MetadataParser {
             this.useLocalCoreVocabularies, true, null);
   }
   
+  public SchemaBasedEdmProvider addToEdmProvider(SchemaBasedEdmProvider existing, Reader csdl)
+      throws XMLStreamException {
+    XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    XMLEventReader reader = xmlInputFactory.createXMLEventReader(csdl);
+    return addToEdmProvider(existing, reader, this.referenceResolver, this.implicitlyLoadCoreVocabularies,
+        this.useLocalCoreVocabularies, true, null);
+  }
+  
   protected SchemaBasedEdmProvider buildEdmProvider(Reader csdl, ReferenceResolver resolver,
                                                     boolean loadCore, boolean useLocal,
                                                     boolean loadReferenceSchemas, String namespace)
@@ -185,11 +193,16 @@ public class MetadataParser {
     XMLEventReader reader = xmlInputFactory.createXMLEventReader(csdl);
     return buildEdmProvider(reader, resolver, loadCore, useLocal, loadReferenceSchemas, namespace);
   } 
+
+  protected SchemaBasedEdmProvider buildEdmProvider(XMLEventReader reader, ReferenceResolver resolver, boolean loadCore,
+      boolean useLocal, boolean loadReferenceSchemas, String namespace) throws XMLStreamException {
+    SchemaBasedEdmProvider provider = new SchemaBasedEdmProvider();
+    return addToEdmProvider(provider, reader, resolver, loadCore, useLocal, loadReferenceSchemas, namespace);
+  }
   
-  protected SchemaBasedEdmProvider buildEdmProvider(XMLEventReader reader,
+  protected SchemaBasedEdmProvider addToEdmProvider(SchemaBasedEdmProvider provider, XMLEventReader reader,
       ReferenceResolver resolver, boolean loadCore, boolean useLocal, boolean loadReferenceSchemas, String namespace)
       throws XMLStreamException {
-    SchemaBasedEdmProvider provider = new SchemaBasedEdmProvider();
     
     final StringBuilder xmlBase = new StringBuilder();
     
@@ -288,7 +301,7 @@ public class MetadataParser {
     }
   }
   
-  private void loadCoreVocabulary(SchemaBasedEdmProvider provider,
+  public void loadCoreVocabulary(SchemaBasedEdmProvider provider,
       String namespace) throws XMLStreamException {
     if("Org.OData.Core.V1".equalsIgnoreCase(namespace)) {
       loadLocalVocabularySchema(provider, "Org.OData.Core.V1", "Org.OData.Core.V1.xml");
@@ -296,6 +309,8 @@ public class MetadataParser {
       loadLocalVocabularySchema(provider, "Org.OData.Capabilities.V1", "Org.OData.Capabilities.V1.xml");
     } else if ("Org.OData.Measures.V1".equalsIgnoreCase(namespace)) {
       loadLocalVocabularySchema(provider, "Org.OData.Measures.V1", "Org.OData.Measures.V1.xml");
+    } else {
+    	throw new XMLStreamException("Unknown namespace to load vocabulary");
     }
   }
 
