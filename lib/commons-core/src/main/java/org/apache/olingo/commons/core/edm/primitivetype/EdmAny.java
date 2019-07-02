@@ -58,8 +58,10 @@ public class EdmAny extends SingletonPrimitiveType {
   protected <T> String internalValueToString(final T value,
       final Boolean isNullable, final Integer maxLength, final Integer precision,
       final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
-    
-    if (value instanceof byte[]) {
+
+    if (value instanceof String) {
+      return (String)value;
+    } else if (value instanceof byte[]) {
       return new String((byte[])value);
     } else {
       throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
