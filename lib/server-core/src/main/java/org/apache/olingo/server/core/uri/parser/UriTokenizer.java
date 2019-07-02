@@ -194,6 +194,7 @@ public class UriTokenizer {
     // STA-specific Tokens
     TimespanValue,
     AnyValue,
+    IdentifierValue,
     SubstringOfMethod,
     ST_EqualsMethod,
     ST_DisjointMethod,
@@ -390,6 +391,9 @@ public class UriTokenizer {
     // Primitive Values
     case AnyValue:
       found = nextAnyValue();
+      break;
+    case IdentifierValue:
+      found = nextIdentifierValue();
       break;
     case BooleanValue:
       found = nextBooleanValue();
@@ -953,15 +957,30 @@ public class UriTokenizer {
   }
   
   /**
-   * Breaks upon the first whitespace encountered.
+   * Breaks upon the first whitespace
    */
   private boolean nextAnyValue() {
-    int length = 0;
-    while (!nextWhitespace()) {
-      length++;
+    if (!nextQualifiedName() && !nextODataIdentifier()) {
+      int original = index;
+      while (!nextWhitespace() && index < parseString.length()) {
+        index++;
+      }
+      if (index > original) {
+        index--;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
-    index+=length;
-    return length > 0;
+  }
+  
+  /**
+   * Breaks upon the first round closing bracket.
+   */
+  private boolean nextIdentifierValue() {
+    return nextStringValue() || nextIntegerValue(false);
   }
   
   private boolean nextBooleanValue() {

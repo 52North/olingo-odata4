@@ -67,6 +67,7 @@ public class ParserHelper {
     /* Enum and null are not present in the map. These have to be handled differently. */
     Map<TokenKind, EdmPrimitiveTypeKind> temp = new EnumMap<TokenKind, EdmPrimitiveTypeKind>(TokenKind.class);
     temp.put(TokenKind.AnyValue, EdmPrimitiveTypeKind.Any);
+    temp.put(TokenKind.IdentifierValue, EdmPrimitiveTypeKind.Any);
     temp.put(TokenKind.BooleanValue, EdmPrimitiveTypeKind.Boolean);
     temp.put(TokenKind.StringValue, EdmPrimitiveTypeKind.String);
     // Very large integer values are of type Edm.Decimal but this is handled elsewhere.
@@ -160,7 +161,9 @@ public class ParserHelper {
         TokenKind.GeographyMultiPolygon,
         TokenKind.GeometryMultiPolygon,
         TokenKind.GeographyCollection,
-        TokenKind.GeometryCollection);
+        TokenKind.GeometryCollection,
+
+        TokenKind.AnyValue);
   }
 
   protected static List<UriParameter> parseFunctionParameters(UriTokenizer tokenizer,
@@ -517,6 +520,8 @@ public class ParserHelper {
           || tokenizer.next(TokenKind.IntegerValue);
     } else if (type.getKind() == EdmTypeKind.ENUM) {
       return tokenizer.next(TokenKind.EnumValue);
+    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Any).equals(type)) {
+      return tokenizer.next(TokenKind.IdentifierValue) || tokenizer.next(TokenKind.AnyValue);
     } else {
       // Check the types that have not been checked already above.
       for (final Entry<TokenKind, EdmPrimitiveTypeKind> entry : tokenToPrimitiveType.entrySet()) {
